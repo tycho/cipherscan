@@ -2203,3 +2203,4 @@ if [[ -n $ALLCIPHERS ]]; then
         printf "%-35s %s\n" "$c" "$r"
     done
 fi
+# vim: set ts=4 sts=4 sw=4 et:
