@@ -654,6 +654,9 @@ test_cipher_on_target() {
     else
         current_curves="None"
         # if pfs uses ECDH, test supported curves
+        if [[ $pfs =~ X25519 ]]; then
+            pfs="ECDH,$pfs"
+        fi
         if [[ $pfs =~ ECDH ]]; then
             has_curves="True"
             if [[ $TEST_CURVES == "True" ]]; then
@@ -1186,6 +1189,9 @@ test_curves() {
             break
         else
             # server accepted connection
+            if [[ "${current_pfs}" =~ X25519 ]]; then
+                current_pfs="ECDH,$current_pfs"
+            fi
             local ephem_data=(${current_pfs//,/ })
             local cname=""
             if [[ ${ephem_data[0]} =~ ECDH ]]; then
@@ -1242,6 +1248,9 @@ test_curves() {
                 fallback_supported="order-specific"
                 verbose "Server aborted connection"
         else
+            if [[ "${current_pfs}" =~ X25519 ]]; then
+                current_pfs="ECDH,$current_pfs"
+            fi
             local ephem_data=(${current_pfs//,/ })
             verbose "Server selected $current_cipher with $current_pfs"
             verbose "ephem_data: ${ephem_data[*]}"
@@ -1309,6 +1318,9 @@ test_curves_fallback() {
             break
         else
             # server accepted connection
+            if [[ "${current_pfs}" =~ X25519 ]]; then
+                current_pfs="ECDH,$current_pfs"
+            fi
             local ephem_data=(${current_pfs//,/ })
 
             if [[ ${ephem_data[0]} =~ ECDH ]]; then
@@ -2099,6 +2111,9 @@ if [[ $TEST_CURVES == "True" ]]; then
     if [[ ! -z "$($OPENSSLBIN s_client -curves 2>&1|head -1|grep 'unknown option')" ]]; then
         echo "curves testing not available with your version of openssl, disabling it" 1>&2
         TEST_CURVES="False"
+    fi
+    if ! $OPENSSLBIN s_client -curves X25519 2>&1 | grep -q 'Error with command'; then
+        CURVES+=('X25519')
     fi
 fi
 
