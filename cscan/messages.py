@@ -114,7 +114,7 @@ class Certificate(messages.Certificate):
                 certificate_list.append(certBytes)
                 index += len(certBytes)+3
             if certificate_list:
-                self.certChain = certificate_list
+                self._certChain = certificate_list
         else:
             raise AssertionError()
 
@@ -133,13 +133,13 @@ class Certificate(messages.Certificate):
         if 'm' in formatstr:
             digest = True
 
-        if self.certChain is None:
+        if self._certChain is None:
             cert_list = None
         else:
-            if isinstance(self.certChain, X509CertChain):
-                cert_list = [cert.bytes for cert in self.certChain.x509List]
+            if isinstance(self._certChain, X509CertChain):
+                cert_list = [cert.bytes for cert in self._certChain.x509List]
             else:
-                cert_list = self.certChain
+                cert_list = self._certChain
 
             if digest:
                 cert_list = "[" + ", ".join(b2a_hex(secureHash(cert, 'sha256'))
