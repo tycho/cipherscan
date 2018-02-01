@@ -509,20 +509,12 @@ test_cipher_on_target() {
     pfs=""
     previous_cipher=""
     certificates=""
-    for tls_version in "-ssl2" "-ssl3" "-tls1" "-tls1_1" "-tls1_2"
+    for tls_version in "-ssl3" "-tls1" "-tls1_1" "-tls1_2"
     do
         # sslv2 client hello doesn't support SNI extension
         # in SSLv3 mode OpenSSL just ignores the setting so it's ok
         # -status exception is ignored in SSLv2, go figure
-        if [[ "$tls_version" == "-ssl2" ]]; then
-            if [[ "$sslcommand" =~ (.*)(-servername\ [^ ]*)(.*) ]]; then
-                cmnd="${BASH_REMATCH[1]} ${BASH_REMATCH[3]}"
-            else
-                cmnd="$sslcommand"
-            fi
-        else
-            cmnd=$sslcommand
-        fi
+        cmnd=$sslcommand
         ratelimit
         debug echo \"Q\" \| $cmnd $tls_version
         local tmp=$(echo "Q" | $cmnd $tls_version 1>/dev/stdout 2>/dev/null)
@@ -1168,7 +1160,7 @@ test_curves() {
     sslcommand+=" -trusted_first"
     # force the TLS to send a TLS1.0 client hello at least, as with SSLv2
     # ciphers present it will try to send a SSLv2 compatible client hello
-    sslcommand+=" -no_ssl2 -no_ssl3"
+    sslcommand+=" -no_ssl3"
 
     #
     # here we use the same logic as with detecting cipher suites: first
@@ -1294,7 +1286,7 @@ test_curves_fallback() {
     sslcommand+=" -status $SCLIENTARGS -connect $TARGET -cipher $ecc_ciphers"
     # force the TLS to send a TLS1.0 client hello at least, as with SSLv2
     # ciphers present it will try to send a SSLv2 compatible client hello
-    sslcommand+=" -no_ssl2 -no_ssl3"
+    sslcommand+=" -no_ssl3"
 
     #
     # here we use the same logic as with detecting cipher suites: first
@@ -1656,7 +1648,7 @@ test_kex_sigalgs() {
         # since some ciphers supported by server may be SSLv2 only, we need to
         # force use of TLSv1.2, otherwise openssl will send a SSLv2 compatible
         # client hello
-        sslcommand+=" -no_ssl2 -no_ssl3"
+        sslcommand+=" -no_ssl3"
         local test_ecdsa_sigalgs=("${ecdsa_sigalgs[@]}")
         local test_rsa_sigalgs=("${rsa_sigalgs[@]}")
 
@@ -1737,7 +1729,7 @@ test_kex_sigalgs() {
         # since some ciphers supported by server may be SSLv2 only, we need to
         # force use of TLSv1.2, otherwise openssl will send a SSLv2 compatible
         # client hello
-        sslcommand+=" -no_ssl2 -no_ssl3"
+        sslcommand+=" -no_ssl3"
         local test_ecdsa_sigalgs=("${ecdsa_sigalgs[@]}")
         local test_rsa_sigalgs=("${rsa_sigalgs[@]}")
 
@@ -1838,7 +1830,7 @@ test_kex_sigalgs() {
         # since some ciphers supported by server may be SSLv2 only, we need to
         # force use of TLSv1.2, otherwise openssl will send a SSLv2 compatible
         # client hello
-        sslcommand+=" -no_ssl2 -no_ssl3"
+        sslcommand+=" -no_ssl3"
 
         ratelimit
         verbose "Test ordering of sigalgs with $sslcommand -sigalgs $test_sigalgs"
@@ -1883,7 +1875,7 @@ test_kex_sigalgs() {
         # since some ciphers supported by server may be SSLv2 only, we need to
         # force use of TLSv1.2, otherwise openssl will send a SSLv2 compatible
         # client hello
-        sslcommand+=" -no_ssl2 -no_ssl3"
+        sslcommand+=" -no_ssl3"
 
         ratelimit
         verbose "Test ordering of sigalgs with $sslcommand -sigalgs $test_sigalgs"
