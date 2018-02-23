@@ -517,7 +517,7 @@ test_cipher_on_target() {
         cmnd=$sslcommand
         ratelimit
         debug echo \"Q\" \| $cmnd $tls_version
-        local tmp=$(echo "Q" | $cmnd $tls_version 1>/dev/stdout 2>/dev/null)
+        local tmp=$(echo "Q" | $cmnd $tls_version 1>/dev/stdout 2>/dev/null | perl -pe 's/[^[:print:]\n]//g')
 
         parse_openssl_output <<<"$tmp"
         verbose "selected cipher is '$current_cipher'"
@@ -1174,7 +1174,7 @@ test_curves() {
         verbose "Testing $test_curves with command $sslcommand"
 
         ratelimit
-        local tmp=$(echo Q | $sslcommand -curves "$test_curves" 2>/dev/null)
+        local tmp=$(echo Q | $sslcommand -curves "$test_curves" 2>/dev/null | perl -pe 's/[^[:print:]\n]//g')
         parse_openssl_output <<<"$tmp"
 
         if [[ -z $current_protocol || $current_cipher == "(NONE)" || $current_cipher == '0000' ]]; then
@@ -1233,7 +1233,7 @@ test_curves() {
 
         verbose "Testing ordering with $sslcommand -curves $test_curves"
         ratelimit
-        local tmp=$(echo Q | $sslcommand -curves "$test_curves" 2>/dev/null)
+        local tmp=$(echo Q | $sslcommand -curves "$test_curves" 2>/dev/null | perl -pe 's/[^[:print:]\n]//g')
         parse_openssl_output <<<"$tmp"
 
         if [[ -z $current_protocol || $current_cipher == "(NONE)" || $current_cipher == '0000' ]]; then
@@ -1301,7 +1301,7 @@ test_curves_fallback() {
         verbose "Testing $sslcommand -curves $test_curves"
 
         ratelimit
-        local tmp=$(echo Q | $sslcommand -curves "$test_curves" 2>/dev/null)
+        local tmp=$(echo Q | $sslcommand -curves "$test_curves" 2>/dev/null | perl -pe 's/[^[:print:]\n]//g')
         parse_openssl_output <<<"$tmp"
 
         if [[ -z $current_protocol || $current_cipher == "(NONE)" || $current_cipher == '0000' ]]; then
@@ -1359,7 +1359,7 @@ test_tls_tolerance() {
     for version in "${!tls_vers_tests[@]}"; do
         ratelimit
         verbose "Testing fallback with $sslcommand ${tls_vers_tests[$version]}"
-        local tmp=$(echo Q | $sslcommand ${tls_vers_tests[$version]} 2>/dev/null)
+        local tmp=$(echo Q | $sslcommand ${tls_vers_tests[$version]} 2>/dev/null | perl -pe 's/[^[:print:]\n]//g')
         parse_openssl_output <<<"$tmp"
         verbose "Negotiated proto: $current_protocol, cipher: $current_cipher"
         if [[ -z $current_protocol || $current_cipher == "(NONE)" \
